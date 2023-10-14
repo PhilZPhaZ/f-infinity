@@ -60,6 +60,21 @@ impl BigNumber {
     pub fn one() -> BigNumber {
         BigNumber::new("1")
     }
+
+    // function to delete the first digit of digits
+    pub fn delete_first_digit(&mut self) {
+        self.digits.0.remove(0);
+    }
+
+    // function to verify if every digit equal 0
+    pub fn is_zero(&self) -> bool {
+        for digit in self.digits.0.iter() {
+            if *digit != 0 {
+                return false;
+            }
+        }
+        true
+    }
 }
 
 impl Add for BigNumber {

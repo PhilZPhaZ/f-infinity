@@ -68,140 +68,84 @@ impl Add for SmallNumber {
     type Output = SmallNumber;
 
     fn add(self, rhs: Self) -> Self::Output {
-        // Dec des nombres
-        let mut dec1: Vec<u8> = self.decimal.0;
-        let mut dec2: Vec<u8> = rhs.decimal.0;
+        // if the two decimal parts of the numbers have not the same length
+        // then we add zero to the rigne to the smallest number to have the same length
+        let mut lhs_decimal: Vec<u8> = self.decimal.0;
+        let mut rhs_decimal: Vec<u8> = rhs.decimal.0;
 
-        // dec la plus grande
-        let mut max_digits: usize = 0;
+        let mut difference: usize = lhs_decimal.len().abs_diff(rhs_decimal.len());
 
-        // add some zeros
-        let difference: usize = (dec1.len() as isize - dec2.len() as isize).abs() as usize;
-        if dec1.len() < dec2.len() {
+        if lhs_decimal.len() == rhs_decimal.len() {
+            difference = lhs_decimal.len() - 1;
+        } else if lhs_decimal.len() > rhs_decimal.len() {
+            //let diff: usize = lhs_decimal.len() - rhs_decimal.len();
             for _ in 0..difference {
-                dec1.push(0);
+                rhs_decimal.push(0);
             }
-            max_digits = dec2.len();
-        } else if dec1.len() > dec2.len() {
+            difference = lhs_decimal.len();
+        } else if lhs_decimal.len() < rhs_decimal.len() {
+            //let diff: usize = rhs_decimal.len() - lhs_decimal.len();
             for _ in 0..difference {
-                dec2.push(0);
+                lhs_decimal.push(0);
             }
-            max_digits = dec1.len();
-        };
+            difference = rhs_decimal.len()
+        }
 
-        let mut dec_result: Vec<u8> = Vec::new();
-        let mut carry: u8 = 0;
+        // convert lhs_decimal to &str and then create a variable self_decimal_number
+        // and store a big number with the value of the string
+        let self_decimal_number_str: String = lhs_decimal
+            .iter()
+            .map(|d| d.to_string())
+            .collect::<Vec<_>>()
+            .join("");
 
-        if (self.signe && rhs.signe) || (!self.signe && !rhs.signe) {
-            // resultat des entiers
-            let mut int_result: i128 = self.integer + rhs.integer;
+        let self_decimal_number: BigNumber = BigNumber::new(&self_decimal_number_str);
 
-            // Add processing
-            for (digit1, digit2) in dec1.iter().rev().zip(dec2.iter().rev()) {
-                let sum: u8 = *digit1 + digit2 + carry;
-                dec_result.push(sum % 10);
-                carry = sum / 10;
-            }
+        // Same thing for rhs_decimal
+        let rhs_decimal_number_str: String = rhs_decimal
+            .iter()
+            .map(|d| d.to_string())
+            .collect::<Vec<_>>()
+            .join("");
 
-            if carry > 0 {
-                dec_result.push(carry);
-            }
+        let rhs_decimal_number: BigNumber = BigNumber::new(&rhs_decimal_number_str);
 
-            if self.signe && rhs.signe {
-                if dec_result.len() > max_digits {
-                    dec_result.reverse();
+        // create a big number with 10^difference+1 from string
+        let ten_pow_difference: String = format!("1{}", "0".repeat(difference+1));
+        let mut one_ten_pow_difference: BigNumber = BigNumber::new(&ten_pow_difference);
 
-                    dec_result.remove(0);
-                    int_result += 1;
+        // if self.signe and rhs.signe
+        if self.signe && rhs.signe {
+            // first we add the two integer parts
+            let mut integer: i128 = self.integer + rhs.integer;
 
-                    SmallNumber {
-                        signe: true,
-                        integer: int_result,
-                        decimal: VecU8(dec_result),
-                    }
-                } else {
-                    SmallNumber {
-                        signe: true,
-                        integer: int_result,
-                        decimal: VecU8(dec_result),
-                    }
-                }
+            // adding the two decimal part
+            let decimal_addition: BigNumber = self_decimal_number + rhs_decimal_number;
+            println!("{} et {}", decimal_addition, one_ten_pow_difference);
+
+            // substract to verify if < 0
+            // verify the carry
+            one_ten_pow_difference = one_ten_pow_difference - decimal_addition.clone();
+            if !one_ten_pow_difference.signe || one_ten_pow_difference.is_zero() {
+                integer = integer + 1;
+                one_ten_pow_difference.delete_first_digit();
             } else {
-                if dec_result.len() > max_digits {
-                    dec_result.reverse();
+                one_ten_pow_difference = decimal_addition;
+            }
 
-                    dec_result.remove(0);
-                    int_result += 1;
+            // we create decimal and store the result here
+            let decimal: Vec<u8> = one_ten_pow_difference.digits.0;
 
-                    // on change le signe
-                    int_result = -int_result;
-
-                    SmallNumber {
-                        signe: false,
-                        integer: int_result,
-                        decimal: VecU8(dec_result),
-                    }
-                } else {
-                    int_result = -int_result;
-                    SmallNumber {
-                        signe: false,
-                        integer: int_result,
-                        decimal: VecU8(dec_result),
-                    }
-                }
+            SmallNumber {
+                integer: integer,
+                signe: true,
+                decimal: VecU8(decimal)
             }
         } else {
-            if self.integer.abs() > rhs.integer.abs() || self.integer.abs() == rhs.integer.abs() {
-                println!("Self est plus grand que rhs ou les meme integer");
-
-                let str1: String = dec1.iter().map(|x: &u8| x.to_string()).collect::<String>();
-                let str2: String = dec2.iter().map(|x: &u8| x.to_string()).collect::<String>();
-
-                // On les convertit en grand nombre
-                let num_dec1: BigNumber = BigNumber::new(&str1);
-                let num_dec2: BigNumber = BigNumber::new(&str2);
-
-                // on fait la difference
-                let difference: BigNumber = num_dec1 - num_dec2;
-
-                // si le resultat est negatif on ajoute la carry
-                if !difference.signe {
-                    let mut max_number: String = String::from("1");
-                    for _ in 0..max_digits {
-                        max_number.push('0');
-                    }
-
-                    let mut max_number: BigNumber = BigNumber::new(&max_number);
-
-                    let sub_bumber: BigNumber = BigNumber::new(&str2);
-                    let add_number: BigNumber = BigNumber::new(&str1);
-
-                    max_number = max_number + add_number;
-
-                    let difference: BigNumber = max_number - sub_bumber;
-
-                    // resultat
-                    let mut dec: Vec<u8> = difference.digits.0;
-
-                    // resultat int
-                    let mut int_result: i128 = self.integer.abs() - rhs.integer.abs();
-
-                    // on check le final
-                    if dec.len() < max_digits {
-                        if !(int_result == 0) {
-                            int_result += 1;
-                        }
-                    }
-
-                    dec.remove(0);
-
-                    println!("{} et {:?}", int_result, dec);
-                }
-
-                SmallNumber::new("0.0")
-            } else {
-                SmallNumber::new("0.0")
-            }
+            SmallNumber::new("0.0")
         }
+
+        
     }
 }
+
