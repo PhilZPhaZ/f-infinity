@@ -129,7 +129,7 @@ impl Add for SmallNumber {
 
         let self_decimal_number: BigNumber = BigNumber::new(&self_decimal_number_str);
         // create also a BigNumber but with the decimal part also
-        let self_number = BigNumber::new(&format!("{}{}", self.integer, &self_decimal_number));
+        let self_number: BigNumber = BigNumber::new(&format!("{}{}", self.integer, &self_decimal_number));
 
         // Same thing for rhs_decimal
         let rhs_decimal_number_str: String = rhs_decimal
@@ -187,35 +187,71 @@ impl Add for SmallNumber {
                 (rhs.clone(), self.clone())
             };
 
+            // we must redo this step because we change the number
+
+            // fill with 0 if missing
+            let mut lhs_decimal: Vec<u8> = biggest_num.decimal.0.clone();
+            let mut rhs_decimal: Vec<u8> = smallest_num.decimal.0.clone();
+    
+            let mut difference: usize = lhs_decimal.len().abs_diff(rhs_decimal.len());
+    
+            // here the 0 are added if the two decimal parts are not the same
+            if lhs_decimal.len() == rhs_decimal.len() {
+                difference = lhs_decimal.len();
+            } else if lhs_decimal.len() > rhs_decimal.len() {
+                for _ in 0..difference {
+                    rhs_decimal.push(0);
+                }
+                difference = lhs_decimal.len();
+            } else if lhs_decimal.len() < rhs_decimal.len() {
+                for _ in 0..difference {
+                    lhs_decimal.push(0);
+                }
+                difference = rhs_decimal.len()
+            }
+
+            // create a big number with 10^difference from string
+            let ten_pow_difference: String = format!("1{}", "0".repeat(difference));
+            let one_ten_pow_difference: BigNumber = BigNumber::new(&ten_pow_difference);
+
+            // convert lhs_decimal to &str and then create a variable self_decimal_number
+            // and store a big number with the value of the string
+            let biggest_decimal_number_dtr: String = lhs_decimal
+                .iter()
+                .map(|d: &u8| d.to_string())
+                .collect::<Vec<_>>()
+                .join("");
+
+            let biggest_decimal_number: BigNumber = BigNumber::new(&biggest_decimal_number_dtr);
+
+            // Same thing for rhs_decimal
+            let smallest_decimal_number_str: String = rhs_decimal
+                .iter()
+                .map(|d: &u8| d.to_string())
+                .collect::<Vec<_>>()
+                .join("");
+
+            let smallest_decimal_number: BigNumber = BigNumber::new(&smallest_decimal_number_str);
+            // all of the number
+
             // first we add the two integer parts
             let mut integer: i128 = biggest_num.integer - smallest_num.integer;
 
-            // convert biggest_num.decimal.0 to &str and then create a variable self_decimal_number
-            // and store a big number with the value of the string
-            let self_decimal_number_str: String = biggest_num.decimal.0
-                .iter()
-                .map(|d: &u8| d.to_string())
-                .collect::<Vec<_>>()
-                .join("");
+            // adding the two decimal part
+            let mut decimal_addition: BigNumber = biggest_decimal_number - smallest_decimal_number;
 
-            let self_decimal_number: BigNumber = BigNumber::new(&self_decimal_number_str);
-            // create also a BigNumber but with the decimal part also
-            let self_number: BigNumber = BigNumber::new(&format!("{}{}", self.integer, &self_decimal_number));
+            // check the carry
+            if !decimal_addition.signe {
+                integer = integer - 1;
+                decimal_addition = one_ten_pow_difference - decimal_addition;
+                decimal_addition.delete_first_digit()
+            }
 
-            // Same thing for smallest_num.decimal.0
-            let rhs_decimal_number_str: String = smallest_num.decimal.0
-                .iter()
-                .map(|d: &u8| d.to_string())
-                .collect::<Vec<_>>()
-                .join("");
-
-            let rhs_decimal_number: BigNumber = BigNumber::new(&rhs_decimal_number_str);
-            // all of the number
-            let rhs_number: BigNumber = BigNumber::new(&format!("{}{}", rhs.integer, &rhs_decimal_number));
-
-            println!("{} et {}", self_number, rhs_number);
-
-            SmallNumber::new("0.0")
+            SmallNumber {
+                integer: integer,
+                signe: biggest_num.signe,
+                decimal: VecU8(decimal_addition.digits.0),
+            }
         }
     }
 }
