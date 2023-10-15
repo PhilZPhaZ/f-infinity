@@ -82,17 +82,16 @@ impl Add for SmallNumber {
         let mut rhs_decimal: Vec<u8> = rhs.decimal.0;
 
         let mut difference: usize = lhs_decimal.len().abs_diff(rhs_decimal.len());
-
+        
+        // here the 0 are added if the two decimal parts are not the same
         if lhs_decimal.len() == rhs_decimal.len() {
             difference = lhs_decimal.len();
         } else if lhs_decimal.len() > rhs_decimal.len() {
-            //let diff: usize = lhs_decimal.len() - rhs_decimal.len();
             for _ in 0..difference {
                 rhs_decimal.push(0);
             }
             difference = lhs_decimal.len();
         } else if lhs_decimal.len() < rhs_decimal.len() {
-            //let diff: usize = rhs_decimal.len() - lhs_decimal.len();
             for _ in 0..difference {
                 lhs_decimal.push(0);
             }
@@ -118,12 +117,12 @@ impl Add for SmallNumber {
 
         let rhs_decimal_number: BigNumber = BigNumber::new(&rhs_decimal_number_str);
 
-        // create a big number with 10^difference+1 from string
+        // create a big number with 10^difference from string
         let ten_pow_difference: String = format!("1{}", "0".repeat(difference));
         let mut one_ten_pow_difference: BigNumber = BigNumber::new(&ten_pow_difference);
 
-        // if self.signe and rhs.signe
-        if self.signe && rhs.signe {
+        // if pos-pos or neg-neg
+        if (self.signe && rhs.signe) || (!self.signe && !rhs.signe){
             // first we add the two integer parts
             let mut integer: i128 = self.integer + rhs.integer;
 
@@ -133,50 +132,29 @@ impl Add for SmallNumber {
             // substract to verify if < 0
             // verify the carry
             one_ten_pow_difference = one_ten_pow_difference - decimal_addition.clone();
-            if !one_ten_pow_difference.signe || one_ten_pow_difference.is_zero() {
-                integer = integer + 1;
+            let new_signe: bool = if !one_ten_pow_difference.signe || one_ten_pow_difference.is_zero() {
+                integer = if self.signe && rhs.signe {
+                    integer + 1
+                } else {
+                    integer - 1
+                };
                 one_ten_pow_difference.delete_first_digit();
+                true
             } else {
-                one_ten_pow_difference = decimal_addition;
-            }
+                //one_ten_pow_difference = decimal_addition;
+                false
+            };
 
             // we create decimal and store the result here
             let decimal: Vec<u8> = one_ten_pow_difference.digits.0;
 
             SmallNumber {
-                    integer: integer,
-                    signe: true,
-                    decimal: VecU8(decimal)
-            }
-        } else if !self.signe && !rhs.signe {
-            // first we add the two integer parts
-            let mut integer: i128 = self.integer + rhs.integer;
-
-            // adding the two decimal part
-            let decimal_addition: BigNumber = self_decimal_number + rhs_decimal_number;
-
-            // substract to verify if < 0
-            // verify the carry
-            one_ten_pow_difference = one_ten_pow_difference - decimal_addition.clone();
-            if !one_ten_pow_difference.signe || one_ten_pow_difference.is_zero() {
-                integer = integer - 1;
-                one_ten_pow_difference.delete_first_digit();
-            } else {
-                one_ten_pow_difference = decimal_addition;
-            }
-
-            // we create decimal and store the result here
-            let decimal: Vec<u8> = one_ten_pow_difference.digits.0;
-
-            SmallNumber {
-                    integer: integer,
-                    signe: false,
-                    decimal: VecU8(decimal)
+                integer: integer,
+                signe: new_signe,
+                decimal: VecU8(decimal),
             }
         } else {
             unimplemented!()
         }
-        
     }
 }
-
