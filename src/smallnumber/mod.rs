@@ -129,24 +129,31 @@ impl Add for SmallNumber {
             // adding the two decimal part
             let decimal_addition: BigNumber = self_decimal_number + rhs_decimal_number;
 
+            println!("{} et {}", decimal_addition, one_ten_pow_difference);
+
             // substract to verify if < 0
             // verify the carry
             one_ten_pow_difference = one_ten_pow_difference - decimal_addition.clone();
-            let new_signe: bool = if !one_ten_pow_difference.signe || one_ten_pow_difference.is_zero() {
+            if !one_ten_pow_difference.signe || one_ten_pow_difference.is_zero() {
                 integer = if self.signe && rhs.signe {
                     integer + 1
                 } else {
                     integer - 1
                 };
                 one_ten_pow_difference.delete_first_digit();
-                true
             } else {
-                //one_ten_pow_difference = decimal_addition;
-                false
+                one_ten_pow_difference = decimal_addition;
             };
 
             // we create decimal and store the result here
             let decimal: Vec<u8> = one_ten_pow_difference.digits.0;
+
+            // change signe if neg-neg
+            let new_signe = if self.signe && rhs.signe {
+                true
+            } else {
+                false
+            };
 
             SmallNumber {
                 integer: integer,
