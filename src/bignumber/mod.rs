@@ -1,5 +1,6 @@
 use std::fmt;
 use std::ops::{Add, Sub};
+use std::cmp::{PartialEq, PartialOrd};
 
 pub struct VecU8(pub Vec<u8>);
 
@@ -74,6 +75,41 @@ impl BigNumber {
             }
         }
         true
+    }
+}
+
+// impl of PartialEq
+impl PartialEq for BigNumber {
+    fn eq(&self, other: &Self) -> bool {
+        if self.digits.0.len() != other.digits.0.len() {
+            return false;
+        }
+        for (digit1, digit2) in self.digits.0.iter().zip(other.digits.0.iter()) {
+            if digit1 != digit2 {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+// impl of PartialOrd just if a BigNumber is greater than the other
+impl PartialOrd for BigNumber {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        if self.digits.0.len() > other.digits.0.len() {
+            return Some(std::cmp::Ordering::Greater);
+        } else if self.digits.0.len() < other.digits.0.len() {
+            return Some(std::cmp::Ordering::Less);
+        } else {
+            for (digit1, digit2) in self.digits.0.iter().zip(other.digits.0.iter()) {
+                if digit1 > digit2 {
+                    return Some(std::cmp::Ordering::Greater);
+                } else if digit1 < digit2 {
+                    return Some(std::cmp::Ordering::Less);
+                }
+            }
+        }
+        Some(std::cmp::Ordering::Equal)
     }
 }
 

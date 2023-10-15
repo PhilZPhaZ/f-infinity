@@ -2,7 +2,6 @@ use super::bignumber::BigNumber;
 use std::fmt;
 use std::ops::Add;
 
-#[derive(Clone)]
 pub struct VecU8(pub Vec<u8>);
 
 impl fmt::Display for VecU8 {
@@ -19,11 +18,33 @@ impl fmt::Display for VecU8 {
     }
 }
 
-#[derive(Clone)]
+// impl clone for VecU8
+impl Clone for VecU8 {
+    fn clone(&self) -> Self {
+        let cloned_digits: Vec<u8> = self.0.iter().cloned().collect();
+        VecU8(cloned_digits)
+    }
+}
+
 pub struct SmallNumber {
     pub signe: bool,
     pub integer: i128,
     pub decimal: VecU8,
+}
+
+// impl .clone for SmallNumber
+impl Clone for SmallNumber {
+    fn clone(&self) -> Self {
+        let signe: bool = self.signe;
+        let integer: i128 = self.integer;
+        let decimal: VecU8 = self.decimal.clone();
+
+        SmallNumber {
+            signe,
+            integer,
+            decimal,
+        }
+    }
 }
 
 // Le display
@@ -50,7 +71,7 @@ impl SmallNumber {
             let integer: i128 = parts[0].parse().unwrap();
             let decimal: Vec<u8> = parts[1]
                 .chars()
-                .map(|c| c.to_digit(10).unwrap() as u8)
+                .map(|c: char| c.to_digit(10).unwrap() as u8)
                 .collect::<Vec<_>>();
 
             if number.contains('-') {
@@ -78,8 +99,8 @@ impl Add for SmallNumber {
     fn add(self, rhs: Self) -> Self::Output {
         // if the two decimal parts of the numbers have not the same length
         // then we add zero to the rigne to the smallest number to have the same length
-        let mut lhs_decimal: Vec<u8> = self.decimal.0;
-        let mut rhs_decimal: Vec<u8> = rhs.decimal.0;
+        let mut lhs_decimal: Vec<u8> = self.decimal.0.clone();
+        let mut rhs_decimal: Vec<u8> = rhs.decimal.0.clone();
 
         let mut difference: usize = lhs_decimal.len().abs_diff(rhs_decimal.len());
         
@@ -102,20 +123,24 @@ impl Add for SmallNumber {
         // and store a big number with the value of the string
         let self_decimal_number_str: String = lhs_decimal
             .iter()
-            .map(|d| d.to_string())
+            .map(|d: &u8| d.to_string())
             .collect::<Vec<_>>()
             .join("");
 
         let self_decimal_number: BigNumber = BigNumber::new(&self_decimal_number_str);
+        // create also a BigNumber but with the decimal part also
+        let self_number = BigNumber::new(&format!("{}{}", self.integer, &self_decimal_number));
 
         // Same thing for rhs_decimal
         let rhs_decimal_number_str: String = rhs_decimal
             .iter()
-            .map(|d| d.to_string())
+            .map(|d: &u8| d.to_string())
             .collect::<Vec<_>>()
             .join("");
 
         let rhs_decimal_number: BigNumber = BigNumber::new(&rhs_decimal_number_str);
+        // all of the number
+        let rhs_number = BigNumber::new(&format!("{}{}", rhs.integer, &rhs_decimal_number));
 
         // create a big number with 10^difference from string
         let ten_pow_difference: String = format!("1{}", "0".repeat(difference));
@@ -128,8 +153,6 @@ impl Add for SmallNumber {
 
             // adding the two decimal part
             let decimal_addition: BigNumber = self_decimal_number + rhs_decimal_number;
-
-            println!("{} et {}", decimal_addition, one_ten_pow_difference);
 
             // substract to verify if < 0
             // verify the carry
@@ -149,7 +172,7 @@ impl Add for SmallNumber {
             let decimal: Vec<u8> = one_ten_pow_difference.digits.0;
 
             // change signe if neg-neg
-            let new_signe = if self.signe && rhs.signe {
+            let new_signe: bool = if self.signe && rhs.signe {
                 true
             } else {
                 false
@@ -161,7 +184,15 @@ impl Add for SmallNumber {
                 decimal: VecU8(decimal),
             }
         } else {
-            unimplemented!()
+            let (biggest_num, smallest_num) = if self_number > rhs_number {
+                (self.clone(), rhs.clone())
+            } else {
+                (rhs.clone(), self.clone())
+            };
+
+            println!("grand: {}, petit: {}", biggest_num, smallest_num);
+
+            SmallNumber::new("0.0")
         }
     }
 }
