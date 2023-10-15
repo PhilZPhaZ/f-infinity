@@ -65,7 +65,12 @@ impl fmt::Display for SmallNumber {
 // implementation new
 impl SmallNumber {
     pub fn new(number: &str) -> SmallNumber {
-        let parts: Vec<&str> = number.split(".").collect();
+        let mut parts: Vec<&str> = number.split(".").collect();
+
+        // remove useless zero
+        while parts[1].ends_with('0') {
+            parts[1] = &parts[1][..parts[1].len() - 1];
+        }
 
         if parts.len() == 2 {
             let integer: i128 = parts[0].parse().unwrap();
