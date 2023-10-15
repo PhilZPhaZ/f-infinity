@@ -77,7 +77,7 @@ impl SmallNumber {
             if number.contains('-') {
                 SmallNumber {
                     signe: false,
-                    integer,
+                    integer: -integer,
                     decimal: VecU8(decimal),
                 }
             } else {
@@ -103,7 +103,7 @@ impl Add for SmallNumber {
         let mut rhs_decimal: Vec<u8> = rhs.decimal.0.clone();
 
         let mut difference: usize = lhs_decimal.len().abs_diff(rhs_decimal.len());
-        
+
         // here the 0 are added if the two decimal parts are not the same
         if lhs_decimal.len() == rhs_decimal.len() {
             difference = lhs_decimal.len();
@@ -140,14 +140,14 @@ impl Add for SmallNumber {
 
         let rhs_decimal_number: BigNumber = BigNumber::new(&rhs_decimal_number_str);
         // all of the number
-        let rhs_number = BigNumber::new(&format!("{}{}", rhs.integer, &rhs_decimal_number));
+        let rhs_number: BigNumber = BigNumber::new(&format!("{}{}", rhs.integer, &rhs_decimal_number));
 
         // create a big number with 10^difference from string
         let ten_pow_difference: String = format!("1{}", "0".repeat(difference));
         let mut one_ten_pow_difference: BigNumber = BigNumber::new(&ten_pow_difference);
 
         // if pos-pos or neg-neg
-        if (self.signe && rhs.signe) || (!self.signe && !rhs.signe){
+        if (self.signe && rhs.signe) || (!self.signe && !rhs.signe) {
             // first we add the two integer parts
             let mut integer: i128 = self.integer + rhs.integer;
 
@@ -172,11 +172,7 @@ impl Add for SmallNumber {
             let decimal: Vec<u8> = one_ten_pow_difference.digits.0;
 
             // change signe if neg-neg
-            let new_signe: bool = if self.signe && rhs.signe {
-                true
-            } else {
-                false
-            };
+            let new_signe: bool = if self.signe && rhs.signe { true } else { false };
 
             SmallNumber {
                 integer: integer,
@@ -184,13 +180,40 @@ impl Add for SmallNumber {
                 decimal: VecU8(decimal),
             }
         } else {
+            // set the biggest number in order to do the sub
             let (biggest_num, smallest_num) = if self_number > rhs_number {
                 (self.clone(), rhs.clone())
             } else {
                 (rhs.clone(), self.clone())
             };
 
-            println!("grand: {}, petit: {}", biggest_num, smallest_num);
+            // first we add the two integer parts
+            let mut integer: i128 = biggest_num.integer - smallest_num.integer;
+
+            // convert biggest_num.decimal.0 to &str and then create a variable self_decimal_number
+            // and store a big number with the value of the string
+            let self_decimal_number_str: String = biggest_num.decimal.0
+                .iter()
+                .map(|d: &u8| d.to_string())
+                .collect::<Vec<_>>()
+                .join("");
+
+            let self_decimal_number: BigNumber = BigNumber::new(&self_decimal_number_str);
+            // create also a BigNumber but with the decimal part also
+            let self_number: BigNumber = BigNumber::new(&format!("{}{}", self.integer, &self_decimal_number));
+
+            // Same thing for smallest_num.decimal.0
+            let rhs_decimal_number_str: String = smallest_num.decimal.0
+                .iter()
+                .map(|d: &u8| d.to_string())
+                .collect::<Vec<_>>()
+                .join("");
+
+            let rhs_decimal_number: BigNumber = BigNumber::new(&rhs_decimal_number_str);
+            // all of the number
+            let rhs_number: BigNumber = BigNumber::new(&format!("{}{}", rhs.integer, &rhs_decimal_number));
+
+            println!("{} et {}", self_number, rhs_number);
 
             SmallNumber::new("0.0")
         }
