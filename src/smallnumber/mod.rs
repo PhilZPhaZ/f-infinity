@@ -29,7 +29,15 @@ pub struct SmallNumber {
 // Le display
 impl fmt::Display for SmallNumber {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}.{}", self.integer, self.decimal)
+        if self.signe {
+            write!(f, "{}.{}", self.integer, self.decimal)
+        } else {
+            if self.integer < 0 {
+                write!(f, "-{}.{}", -self.integer, self.decimal)
+            } else {
+                write!(f, "-{}.{}", self.integer, self.decimal)
+            }
+        }
     }
 }
 
@@ -76,7 +84,7 @@ impl Add for SmallNumber {
         let mut difference: usize = lhs_decimal.len().abs_diff(rhs_decimal.len());
 
         if lhs_decimal.len() == rhs_decimal.len() {
-            difference = lhs_decimal.len() - 1;
+            difference = lhs_decimal.len();
         } else if lhs_decimal.len() > rhs_decimal.len() {
             //let diff: usize = lhs_decimal.len() - rhs_decimal.len();
             for _ in 0..difference {
@@ -111,7 +119,7 @@ impl Add for SmallNumber {
         let rhs_decimal_number: BigNumber = BigNumber::new(&rhs_decimal_number_str);
 
         // create a big number with 10^difference+1 from string
-        let ten_pow_difference: String = format!("1{}", "0".repeat(difference+1));
+        let ten_pow_difference: String = format!("1{}", "0".repeat(difference));
         let mut one_ten_pow_difference: BigNumber = BigNumber::new(&ten_pow_difference);
 
         // if self.signe and rhs.signe
@@ -121,7 +129,6 @@ impl Add for SmallNumber {
 
             // adding the two decimal part
             let decimal_addition: BigNumber = self_decimal_number + rhs_decimal_number;
-            println!("{} et {}", decimal_addition, one_ten_pow_difference);
 
             // substract to verify if < 0
             // verify the carry
@@ -137,14 +144,38 @@ impl Add for SmallNumber {
             let decimal: Vec<u8> = one_ten_pow_difference.digits.0;
 
             SmallNumber {
-                integer: integer,
-                signe: true,
-                decimal: VecU8(decimal)
+                    integer: integer,
+                    signe: true,
+                    decimal: VecU8(decimal)
+            }
+        } else if !self.signe && !rhs.signe {
+            // first we add the two integer parts
+            let mut integer: i128 = self.integer + rhs.integer;
+
+            // adding the two decimal part
+            let decimal_addition: BigNumber = self_decimal_number + rhs_decimal_number;
+
+            // substract to verify if < 0
+            // verify the carry
+            one_ten_pow_difference = one_ten_pow_difference - decimal_addition.clone();
+            if !one_ten_pow_difference.signe || one_ten_pow_difference.is_zero() {
+                integer = integer - 1;
+                one_ten_pow_difference.delete_first_digit();
+            } else {
+                one_ten_pow_difference = decimal_addition;
+            }
+
+            // we create decimal and store the result here
+            let decimal: Vec<u8> = one_ten_pow_difference.digits.0;
+
+            SmallNumber {
+                    integer: integer,
+                    signe: false,
+                    decimal: VecU8(decimal)
             }
         } else {
-            SmallNumber::new("0.0")
+            unimplemented!()
         }
-
         
     }
 }
