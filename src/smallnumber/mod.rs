@@ -129,7 +129,8 @@ impl Add for SmallNumber {
 
         let self_decimal_number: BigNumber = BigNumber::new(&self_decimal_number_str);
         // create also a BigNumber but with the decimal part also
-        let self_number: BigNumber = BigNumber::new(&format!("{}{}", self.integer, &self_decimal_number));
+        let self_number: BigNumber =
+            BigNumber::new(&format!("{}{}", self.integer, &self_decimal_number));
 
         // Same thing for rhs_decimal
         let rhs_decimal_number_str: String = rhs_decimal
@@ -140,7 +141,8 @@ impl Add for SmallNumber {
 
         let rhs_decimal_number: BigNumber = BigNumber::new(&rhs_decimal_number_str);
         // all of the number
-        let rhs_number: BigNumber = BigNumber::new(&format!("{}{}", rhs.integer, &rhs_decimal_number));
+        let rhs_number: BigNumber =
+            BigNumber::new(&format!("{}{}", rhs.integer, &rhs_decimal_number));
 
         // create a big number with 10^difference from string
         let ten_pow_difference: String = format!("1{}", "0".repeat(difference));
@@ -192,9 +194,9 @@ impl Add for SmallNumber {
             // fill with 0 if missing
             let mut lhs_decimal: Vec<u8> = biggest_num.decimal.0.clone();
             let mut rhs_decimal: Vec<u8> = smallest_num.decimal.0.clone();
-    
+
             let mut difference: usize = lhs_decimal.len().abs_diff(rhs_decimal.len());
-    
+
             // here the 0 are added if the two decimal parts are not the same
             if lhs_decimal.len() == rhs_decimal.len() {
                 difference = lhs_decimal.len();
