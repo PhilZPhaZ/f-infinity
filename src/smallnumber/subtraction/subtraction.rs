@@ -5,6 +5,7 @@ impl std::ops::Sub for SmallNumber {
     type Output = SmallNumber;
 
     fn sub(self, rhs: Self) -> Self::Output {
+        let signe: bool;
         // if the two decimal parts of the numbers have not the same length
         // then we add zero to the rigne to the smallest number to have the same length
         let mut lhs_decimal: Vec<u8> = self.decimal.0.clone();
@@ -79,14 +80,17 @@ impl std::ops::Sub for SmallNumber {
             };
 
             // change signe if neg-neg
-            let new_signe: bool = one_ten_pow_difference.is_zero();
+            // let new_signe: bool = one_ten_pow_difference.is_zero();
 
             // we create decimal and store the result here
             let decimal: Vec<u8> = one_ten_pow_difference.digits.0;
 
+            // on trouve le signe
+            signe = self.signe && !rhs.signe && (rhs_number != self_number);
+
             SmallNumber {
                 integer: integer,
-                signe: new_signe,
+                signe: signe,
                 decimal: VecU8(decimal),
             }
         } else {
@@ -157,9 +161,12 @@ impl std::ops::Sub for SmallNumber {
                 decimal_addition.delete_first_digit()
             }
 
+            // find the signe of the result
+            signe = (self.signe && rhs_number < self_number) || (!self.signe && rhs_number > self_number);
+
             SmallNumber {
                 integer: integer,
-                signe: decimal_addition.is_zero(),
+                signe: signe,
                 decimal: VecU8(decimal_addition.digits.0),
             }
         }
