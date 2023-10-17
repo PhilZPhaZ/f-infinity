@@ -156,7 +156,8 @@ impl std::ops::Sub for SmallNumber {
 
             // check the carry
             if !decimal_addition.signe {
-                integer = integer + 1;
+                integer = integer - 1;
+
                 decimal_addition = one_ten_pow_difference - decimal_addition;
                 decimal_addition.delete_first_digit()
             }

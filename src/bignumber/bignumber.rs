@@ -213,6 +213,11 @@ impl Sub for BigNumber {
 
         result.reverse();
 
+        // add 0 if result is empty
+        if result.len() == 0 {
+            result.push(0);
+        }
+
         // if the last element >= 10 in result, then we add 1 the the second to last and remove the last value
         if result[len_result - 1] >= 10 {
             result[len_result - 2] += 1;
