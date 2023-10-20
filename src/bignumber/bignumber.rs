@@ -1,6 +1,6 @@
 use std::cmp::{PartialEq, PartialOrd};
 use std::fmt;
-use std::ops::{Add, Sub};
+use std::ops::{Add, Sub, Mul};
 
 pub struct VecU8(pub Vec<u8>);
 
@@ -39,7 +39,11 @@ impl Clone for BigNumber {
 // Le display
 impl fmt::Display for BigNumber {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.digits)
+        if self.signe {
+            write!(f, "{}", self.digits)
+        } else {
+            write!(f, "-{}", self.digits)
+        }
     }
 }
 
@@ -47,14 +51,21 @@ impl fmt::Display for BigNumber {
 impl BigNumber {
     #[allow(dead_code)]
     pub fn new(number: &str) -> BigNumber {
-        let digits: Vec<u8> = number
+        let mut digits: Vec<u8> = number
             .chars()
             .filter_map(|c: char| c.to_digit(10).map(|d: u32| d as u8))
             .collect();
 
+        // remove the first zeros if there are in digits
+        // example : [0, 0, 4, 6] -> [4, 6]
+        digits = digits.into_iter().skip_while(|&x| x == 0).collect();
+
+        // if the number is negative, we change the signe
+        let signe: bool = !number.starts_with('-');
+
         BigNumber {
             digits: VecU8(digits),
-            signe: true,
+            signe: signe,
         }
     }
 
@@ -227,6 +238,94 @@ impl Sub for BigNumber {
         BigNumber {
             digits: VecU8(result),
             signe: !is_negative,
+        }
+    }
+}
+
+impl Mul for BigNumber {
+    type Output = BigNumber;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        let mut num1: Vec<u8> = self.digits.0;
+        let mut num2: Vec<u8> = rhs.digits.0;
+
+        // Add some zero to have the same len
+        let difference: usize = (num1.len() as isize - num2.len() as isize).abs() as usize;
+        if num1.len() < num2.len() {
+            for _ in 0..difference {
+                num1.insert(0, 0);
+            }
+        } else if num1.len() > num2.len() {
+            for _ in 0..difference {
+                num2.insert(0, 0);
+            }
+        }
+
+        let mut result: Vec<Vec<u8>> = vec![];
+
+        // reverse the list to do the operation
+        num1.reverse();
+        num2.reverse();
+
+        // loop for the multiplication
+        for (i, mul_number_down) in num2.iter().enumerate() {
+            let mut carry: u8 = 0;
+
+            let mut sub_result: Vec<u8> = vec![];
+
+            for (_, mul_number_up) in num1.iter().enumerate() {
+                let mul: u8 = mul_number_down * mul_number_up + carry;
+                sub_result.insert(0, mul % 10);
+                carry = mul / 10;
+            }
+            sub_result.insert(0, carry);
+
+            for _ in 0..i {
+                sub_result.push(0);
+            }
+
+            result.push(sub_result);
+        }
+        // reserve to do the addition
+        result.iter_mut().for_each(|v| {
+            v.reverse();
+        });
+        // add zeros to vec in result to have the same length
+        let max_len: usize = result.iter().map(|v| v.len()).max().unwrap();
+        result.iter_mut().for_each(|v| {
+            let len: usize = v.len();
+            for _ in 0..(max_len - len) {
+                v.push(0)
+            }
+        });
+
+        // final addition of vec in result
+        let mut result_final: Vec<u8> = vec![];
+        let mut carry: u8 = 0;
+
+        // add first element of each vec in result and if > 10 add to carry and add to next elem of vec
+        for i in 0..max_len {
+            let mut sum: u8 = 0;
+            for j in 0..result.len() {
+                sum += result[j][i];
+            }
+            sum += carry;
+            result_final.push(sum % 10);
+            carry = sum / 10;
+        }
+
+        // reverse the result
+        result_final.reverse();
+
+        // remove useless 0
+        result_final = result_final.into_iter().skip_while(|&x| x == 0).collect();
+
+        // find the signe
+        let signe: bool = self.signe == rhs.signe;
+
+        BigNumber {
+            digits: VecU8(result_final),
+            signe
         }
     }
 }
