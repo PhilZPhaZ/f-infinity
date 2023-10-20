@@ -59,6 +59,9 @@ impl BigNumber {
         // remove the first zeros if there are in digits
         // example : [0, 0, 4, 6] -> [4, 6]
         digits = digits.into_iter().skip_while(|&x| x == 0).collect();
+        if digits.is_empty() {
+            digits.push(0);
+        }
 
         // if the number is negative, we change the signe
         let signe: bool = !number.starts_with('-');
@@ -319,6 +322,9 @@ impl Mul for BigNumber {
 
         // remove useless 0
         result_final = result_final.into_iter().skip_while(|&x| x == 0).collect();
+        if result_final.is_empty() {
+            result_final.push(0);
+        }
 
         // find the signe
         let signe: bool = self.signe == rhs.signe;
