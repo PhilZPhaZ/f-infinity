@@ -1,5 +1,5 @@
 use std::fmt;
-use super::super::BigNumber;
+use std::cmp::PartialEq;
 
 pub struct VecU8(pub Vec<u8>);
 
@@ -22,6 +22,13 @@ impl Clone for VecU8 {
     fn clone(&self) -> Self {
         let cloned_digits: Vec<u8> = self.0.iter().cloned().collect();
         VecU8(cloned_digits)
+    }
+}
+
+// impl PartialEq for VecU8
+impl PartialEq for VecU8 {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
     }
 }
 
@@ -101,12 +108,11 @@ impl SmallNumber {
     }
 }
 
-impl SmallNumber {
-    // function to have the len of decimal and put it in a bignumber
-    pub fn len_decimal(&self) -> BigNumber {
-        let len_decimal: usize = self.decimal.0.len();
-        let len_decimal: String = len_decimal.to_string();
-
-        BigNumber::new(&len_decimal)
+// impl PartialEq
+impl PartialEq for SmallNumber {
+    fn eq(&self, other: &Self) -> bool {
+        self.signe == other.signe
+            && self.integer == other.integer
+            && self.decimal == other.decimal
     }
 }
