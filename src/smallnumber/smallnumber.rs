@@ -1,4 +1,5 @@
 use std::fmt;
+use super::super::BigNumber;
 
 pub struct VecU8(pub Vec<u8>);
 
@@ -69,6 +70,10 @@ impl SmallNumber {
         while parts[1].ends_with('0') {
             parts[1] = &parts[1][..parts[1].len() - 1];
         }
+        // if empty add 1 zero
+        if parts[1].is_empty() {
+            parts[1] = "0";
+        }
 
         if parts.len() == 2 {
             let integer: i128 = parts[0].parse().unwrap();
@@ -96,3 +101,12 @@ impl SmallNumber {
     }
 }
 
+impl SmallNumber {
+    // function to have the len of decimal and put it in a bignumber
+    pub fn len_decimal(&self) -> BigNumber {
+        let len_decimal: usize = self.decimal.0.len();
+        let len_decimal: String = len_decimal.to_string();
+
+        BigNumber::new(&len_decimal)
+    }
+}

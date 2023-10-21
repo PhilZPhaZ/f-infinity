@@ -5,8 +5,8 @@ use smallnumber::smallnumber::SmallNumber;
 use bignumber::bignumber::BigNumber;
 
 fn main() {
-    let n1 = BigNumber::new("0");
-    let n2 = BigNumber::new("987654321");
+    let n1 = SmallNumber::new("2.12345");
+    let n2 = SmallNumber::new("0.0024");
 
     let n3 = n1 * n2;
 

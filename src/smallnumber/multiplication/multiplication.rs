@@ -1,9 +1,15 @@
 use super::super::smallnumber::{SmallNumber, VecU8};
+use super::super::super::BigNumber;
 
 impl std::ops::Mul for SmallNumber {
     type Output = SmallNumber;
 
     fn mul(self, rhs: Self) -> Self::Output {
+        let self_dot_placement: i128 = self.decimal.0.len().try_into().unwrap();
+        let rhs_dot_placement: i128 = rhs.decimal.0.len().try_into().unwrap();
+
+        let dot_placement: i128 = self_dot_placement + rhs_dot_placement;
+
         // create a Vec i128 with self.integer (i128) an self.decimal.0 (Vec u8)
         let mut self_number: Vec<i128> = vec![self.integer];
         for value in self.decimal.0.iter() {
@@ -16,6 +22,54 @@ impl std::ops::Mul for SmallNumber {
             rhs_number.push(*value as i128);
         }
 
-        SmallNumber::new("0.0")
+        // convert self_number into String
+        let mut self_number_string: String = String::new();
+        for value in self_number.iter() {
+            self_number_string.push_str(&value.to_string());
+        }
+
+        // convert rhs_number into String
+        let mut rhs_number_string: String = String::new();
+        for value in rhs_number.iter() {
+            rhs_number_string.push_str(&value.to_string());
+        }
+
+        println!("{} et {}", self_number_string, rhs_number_string);
+
+        // multiply 2 BigNumber to have the result
+        let mut result: BigNumber = BigNumber::new(&self_number_string) * BigNumber::new(&rhs_number_string);
+
+        // add the dot
+        let len_result: i128 = result.digits.0.len().try_into().unwrap();
+        let mut dot_placement: i128 = len_result - dot_placement;
+
+        let mut integer: i128 = 0;
+        let mut decimal: VecU8 = VecU8(vec![0]);
+
+        // if dot placement <= 0 add 0 to result
+        if dot_placement <= 0 {
+            for _ in 0..(dot_placement * -1) {
+                result.digits.0.insert(0, 0);
+            }
+            dot_placement = 0;
+        }
+
+        // println!("{} et {}", result, dot_placement);
+
+        // split number between integer and decimal part
+        for (i, value) in result.digits.0.iter().enumerate() {
+            if i < dot_placement as usize {
+                integer = integer * 10 + *value as i128;
+            } else {
+                decimal.0.push(*value);
+            }
+        }
+        decimal.0.remove(0);
+
+        SmallNumber {
+            signe: self.signe == rhs.signe,
+            integer,
+            decimal,
+        }
     }
 }
