@@ -34,8 +34,6 @@ impl std::ops::Mul for SmallNumber {
             rhs_number_string.push_str(&value.to_string());
         }
 
-        println!("{} et {}", self_number_string, rhs_number_string);
-
         // multiply 2 BigNumber to have the result
         let mut result: BigNumber = BigNumber::new(&self_number_string) * BigNumber::new(&rhs_number_string);
 
@@ -53,8 +51,6 @@ impl std::ops::Mul for SmallNumber {
             }
             dot_placement = 0;
         }
-
-        // println!("{} et {}", result, dot_placement);
 
         // split number between integer and decimal part
         for (i, value) in result.digits.0.iter().enumerate() {

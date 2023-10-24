@@ -73,16 +73,16 @@ impl SmallNumber {
     pub fn new(number: &str) -> SmallNumber {
         let mut parts: Vec<&str> = number.split(".").collect();
 
-        // remove useless zero
-        while parts[1].ends_with('0') {
-            parts[1] = &parts[1][..parts[1].len() - 1];
-        }
-        // if empty add 1 zero
-        if parts[1].is_empty() {
-            parts[1] = "0";
-        }
-
         if parts.len() == 2 {
+            // remove useless zero
+            while parts[1].ends_with('0') {
+                parts[1] = &parts[1][..parts[1].len() - 1];
+            }
+            // if empty add 1 zero
+            if parts[1].is_empty() {
+                parts[1] = "0";
+            }
+
             let integer: i128 = parts[0].parse().unwrap();
             let decimal: Vec<u8> = parts[1]
                 .chars()
