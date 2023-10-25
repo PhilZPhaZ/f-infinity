@@ -116,3 +116,10 @@ impl PartialEq for SmallNumber {
             && self.decimal == other.decimal
     }
 }
+
+impl SmallNumber {
+    // impl len for SmallNumber (decimal and integer)
+    pub fn len(&self) -> usize {
+        self.decimal.0.len() + self.integer.to_string().len()
+    }
+}
