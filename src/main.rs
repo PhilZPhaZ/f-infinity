@@ -7,10 +7,10 @@ use bignumber::bignumber::BigNumber;
 use rationalnumber::rationalnumber::RationalNumber;
 
 fn main() {
-    let n1 = RationalNumber::new("2.0", "3.0");
-    let n2 = RationalNumber::new("3.0", "5.0");
+    let n1 = SmallNumber::new("2.345");
+    let n2 = SmallNumber::new("3.0");
 
-    let n3 = n1 + n2;
+    let n3 = n1 / n2;
 
     println!("{}", n3);
 }
