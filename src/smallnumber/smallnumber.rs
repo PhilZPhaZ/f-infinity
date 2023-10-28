@@ -1,5 +1,5 @@
-use std::fmt;
 use std::cmp::PartialEq;
+use std::fmt;
 
 pub struct VecU8(pub Vec<u8>);
 
@@ -111,9 +111,7 @@ impl SmallNumber {
 // impl PartialEq
 impl PartialEq for SmallNumber {
     fn eq(&self, other: &Self) -> bool {
-        self.signe == other.signe
-            && self.integer == other.integer
-            && self.decimal == other.decimal
+        self.signe == other.signe && self.integer == other.integer && self.decimal == other.decimal
     }
 }
 

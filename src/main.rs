@@ -1,10 +1,10 @@
-mod smallnumber;
 mod bignumber;
 mod rationalnumber;
+mod smallnumber;
 
-use smallnumber::smallnumber::SmallNumber;
 use bignumber::bignumber::BigNumber;
 use rationalnumber::rationalnumber::RationalNumber;
+use smallnumber::smallnumber::SmallNumber;
 
 fn main() {
     let n1 = SmallNumber::new("2.345");

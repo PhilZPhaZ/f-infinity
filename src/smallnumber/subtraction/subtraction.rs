@@ -1,5 +1,5 @@
-use super::super::smallnumber::{SmallNumber, VecU8};
 use super::super::super::bignumber::bignumber::BigNumber;
+use super::super::smallnumber::{SmallNumber, VecU8};
 
 impl std::ops::Sub for SmallNumber {
     type Output = SmallNumber;
@@ -163,7 +163,8 @@ impl std::ops::Sub for SmallNumber {
             }
 
             // find the signe of the result
-            signe = (self.signe && rhs_number < self_number) || (!self.signe && rhs_number > self_number);
+            signe = (self.signe && rhs_number < self_number)
+                || (!self.signe && rhs_number > self_number);
 
             SmallNumber {
                 integer: integer,

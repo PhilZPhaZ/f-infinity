@@ -1,5 +1,5 @@
-use super::super::smallnumber::{SmallNumber, VecU8};
 use super::super::super::BigNumber;
+use super::super::smallnumber::{SmallNumber, VecU8};
 
 impl std::ops::Mul for SmallNumber {
     type Output = SmallNumber;
@@ -35,7 +35,8 @@ impl std::ops::Mul for SmallNumber {
         }
 
         // multiply 2 BigNumber to have the result
-        let mut result: BigNumber = BigNumber::new(&self_number_string) * BigNumber::new(&rhs_number_string);
+        let mut result: BigNumber =
+            BigNumber::new(&self_number_string) * BigNumber::new(&rhs_number_string);
 
         // add the dot
         let len_result: i128 = result.digits.0.len().try_into().unwrap();

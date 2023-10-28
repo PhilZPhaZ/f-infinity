@@ -1,5 +1,5 @@
-pub mod smallnumber;
 pub mod addition;
-pub mod subtraction;
-pub mod multiplication;
 pub mod division;
+pub mod multiplication;
+pub mod smallnumber;
+pub mod subtraction;

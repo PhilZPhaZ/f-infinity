@@ -1,6 +1,6 @@
 use std::cmp::{PartialEq, PartialOrd};
 use std::fmt;
-use std::ops::{Add, Sub, Mul};
+use std::ops::{Add, Mul, Sub};
 
 pub struct VecU8(pub Vec<u8>);
 
@@ -331,7 +331,7 @@ impl Mul for BigNumber {
 
         BigNumber {
             digits: VecU8(result_final),
-            signe
+            signe,
         }
     }
 }

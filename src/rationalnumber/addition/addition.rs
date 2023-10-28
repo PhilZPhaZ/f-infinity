@@ -1,5 +1,5 @@
-use super::super::rationalnumber::RationalNumber;
 use super::super::super::SmallNumber;
+use super::super::rationalnumber::RationalNumber;
 
 impl std::ops::Add for RationalNumber {
     type Output = RationalNumber;
@@ -24,7 +24,7 @@ impl std::ops::Add for RationalNumber {
         RationalNumber {
             numerator: new_numerator,
             denominator: new_denominator,
-            signe: new_signe
+            signe: new_signe,
         }
     }
 }
