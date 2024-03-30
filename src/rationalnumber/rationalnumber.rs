@@ -1,4 +1,5 @@
 use super::super::SmallNumber;
+use super::super::BigNumber;
 use std::fmt;
 
 pub struct RationalNumber {
@@ -44,6 +45,32 @@ impl RationalNumber {
             numerator,
             denominator,
             signe,
+        }
+    }
+
+    pub fn generate_number(&self, number_of_decimal: i128) {
+        let mut _final_number: Vec<String> = vec![];
+
+        let n1: Vec<String> = self.numerator.get_number_in_vec_str();
+        let n2: Vec<String> = self.denominator.get_number_in_vec_str();
+
+        let mut number_of_decimals: i128 = 0;
+
+        let index_first_number: usize = 0;
+        let index_second_number: usize = 0;
+
+        while number_of_decimals < number_of_decimal {
+            let first_number_to_try: String = n1[index_first_number].clone();
+            let first_number_bigint: BigNumber = BigNumber::new(&first_number_to_try);
+
+            let second_number_to_try: String = n2[index_second_number].clone();
+            let second_number_bigint: BigNumber = BigNumber::new(&second_number_to_try);
+
+            if first_number_bigint > second_number_bigint {
+                continue;
+            }
+
+            number_of_decimals += 1;
         }
     }
 }

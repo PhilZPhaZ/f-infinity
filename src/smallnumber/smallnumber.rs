@@ -120,4 +120,16 @@ impl SmallNumber {
     pub fn len(&self) -> usize {
         self.decimal.0.len() + self.integer.to_string().len()
     }
+
+    pub fn get_number_in_vec_str(&self) -> Vec<String> {
+        // partie decimale
+        let mut vec_str: Vec<String> = self.decimal.clone().0.into_iter()
+            .map(|c: u8| c.to_string())
+            .collect();
+
+        // partie entière
+        vec_str.insert(0, self.integer.to_string());
+
+        vec_str
+    }
 }
