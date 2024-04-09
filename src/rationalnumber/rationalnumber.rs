@@ -1,5 +1,4 @@
 use super::super::SmallNumber;
-use super::super::BigNumber;
 use std::fmt;
 
 pub struct RationalNumber {
@@ -15,18 +14,21 @@ impl fmt::Display for RationalNumber {
         number.push_str(&self.numerator.to_string());
         number.push('\n');
 
-        let longest: usize = if self.numerator.len() > self.denominator.len() {
+        /*
+        let longest = if self.numerator.len() > self.denominator.len() {
             self.numerator.len()
         } else {
             self.denominator.len()
         };
         // Add leading zeros to make the numbers equal length
+
         let mut frac_string = String::new();
         for _ in 0..longest + 1 {
             frac_string.push('-');
         }
+        */
 
-        number.push_str(&frac_string);
+        // number.push_str(&frac_string);
         number.push('\n');
         number.push_str(&self.denominator.to_string());
 
@@ -35,6 +37,7 @@ impl fmt::Display for RationalNumber {
 }
 
 impl RationalNumber {
+    #[warn(dead_code)]
     pub fn new(numerator: &str, denominator: &str) -> RationalNumber {
         let numerator: SmallNumber = SmallNumber::new(numerator);
         let denominator: SmallNumber = SmallNumber::new(denominator);

@@ -10,14 +10,25 @@ impl std::ops::Mul for SmallNumber {
 
         let dot_placement: i128 = self_dot_placement + rhs_dot_placement;
 
+        // convert BigNumber to i128
+        let mut temp = self.integer.digits.0;
+        let mut bytes = [0u8; 16];
+        temp.copy_from_slice(&mut bytes);
+        let self_integer = i128::from_le_bytes(bytes);
+
         // create a Vec i128 with self.integer (i128) an self.decimal.0 (Vec u8)
-        let mut self_number: Vec<i128> = vec![self.integer];
+        let mut self_number: Vec<i128> = vec![self_integer];
         for value in self.decimal.0.iter() {
             self_number.push(*value as i128);
         }
 
         // same for rhs
-        let mut rhs_number: Vec<i128> = vec![rhs.integer];
+        let mut temp = rhs.integer.digits.0;
+        let mut bytes = [0u8; 16];
+        temp.copy_from_slice(&mut bytes);
+        let rhs_integer = i128::from_le_bytes(bytes);
+
+        let mut rhs_number: Vec<i128> = vec![rhs_integer];
         for value in rhs.decimal.0.iter() {
             rhs_number.push(*value as i128);
         }
@@ -63,9 +74,12 @@ impl std::ops::Mul for SmallNumber {
         }
         decimal.0.remove(0);
 
+        let str_integer = integer.to_string();
+        let bignumber_integer = BigNumber::new(&str_integer);
+
         SmallNumber {
             signe: self.signe == rhs.signe,
-            integer,
+            integer: bignumber_integer,
             decimal,
         }
     }

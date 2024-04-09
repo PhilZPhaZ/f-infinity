@@ -1,5 +1,6 @@
 use std::cmp::PartialEq;
 use std::fmt;
+use super::super::bignumber::bignumber::BigNumber;
 
 pub struct VecU8(pub Vec<u8>);
 
@@ -34,7 +35,7 @@ impl PartialEq for VecU8 {
 
 pub struct SmallNumber {
     pub signe: bool,
-    pub integer: i128,
+    pub integer: BigNumber,
     pub decimal: VecU8,
 }
 
@@ -42,7 +43,7 @@ pub struct SmallNumber {
 impl Clone for SmallNumber {
     fn clone(&self) -> Self {
         let signe: bool = self.signe;
-        let integer: i128 = self.integer;
+        let integer: BigNumber = self.integer.clone();
         let decimal: VecU8 = self.decimal.clone();
 
         SmallNumber {
@@ -59,8 +60,8 @@ impl fmt::Display for SmallNumber {
         if self.signe {
             write!(f, "{}.{}", self.integer, self.decimal)
         } else {
-            if self.integer < 0 {
-                write!(f, "-{}.{}", -self.integer, self.decimal)
+            if self.integer < BigNumber::zero() {
+                write!(f, "{}.{}", self.integer, self.decimal)
             } else {
                 write!(f, "-{}.{}", self.integer, self.decimal)
             }
@@ -83,7 +84,7 @@ impl SmallNumber {
                 parts[1] = "0";
             }
 
-            let integer: i128 = parts[0].parse().unwrap();
+            let integer: BigNumber = BigNumber::new(parts[0]);
             let decimal: Vec<u8> = parts[1]
                 .chars()
                 .map(|c: char| c.to_digit(10).unwrap() as u8)
@@ -92,7 +93,7 @@ impl SmallNumber {
             if number.contains('-') {
                 SmallNumber {
                     signe: false,
-                    integer: -integer,
+                    integer: integer,
                     decimal: VecU8(decimal),
                 }
             } else {
@@ -106,6 +107,14 @@ impl SmallNumber {
             panic!("Invalid format");
         }
     }
+
+    pub fn len(&self) -> BigNumber {
+        let mut len = self.integer.len();
+        for _i in &self.decimal.0 {
+            len = len + BigNumber::one()
+        }
+        len
+    }
 }
 
 // impl PartialEq
@@ -116,11 +125,6 @@ impl PartialEq for SmallNumber {
 }
 
 impl SmallNumber {
-    // impl len for SmallNumber (decimal and integer)
-    pub fn len(&self) -> usize {
-        self.decimal.0.len() + self.integer.to_string().len()
-    }
-
     pub fn get_number_in_vec_str(&self) -> Vec<String> {
         // partie decimale
         let mut vec_str: Vec<String> = self.decimal.clone().0.into_iter()

@@ -95,6 +95,38 @@ impl BigNumber {
         }
         true
     }
+
+    pub fn set_signe_to_positive(&mut self) {
+        self.signe = true;
+    }
+
+    pub fn len(&self) -> BigNumber {
+        let mut len = BigNumber::zero();
+        for _i in &self.digits.0 {
+            len = len + BigNumber::one()
+        }
+        len
+    }
+
+    pub fn separate_in_two_str(&self, number_of_digits: BigNumber) -> (String, Vec<u8>) {
+        let mut i = BigNumber::zero();
+        let mut string_result_first_part: String = String::new();
+        let mut vec_result_second_part: Vec<u8> = vec![];
+        let mut index = 0;
+
+        while i < number_of_digits {
+            i = i + BigNumber::one();
+            string_result_first_part.push_str(format!("{}", self.digits.0[index]).as_str());
+            index += 1;
+        }
+        while i < self.len() {
+            vec_result_second_part.push(self.digits.0[index]);
+            i = i + BigNumber::one();
+            index += 1;
+        }
+
+        (string_result_first_part, vec_result_second_part)
+    }
 }
 
 // impl of PartialEq
