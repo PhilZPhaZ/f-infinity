@@ -7,10 +7,9 @@ use rationalnumber::rationalnumber::RationalNumber;
 use smallnumber::smallnumber::SmallNumber;
 
 fn main() {
-    let n1 = SmallNumber::new("1.003601");
-    let n2 = SmallNumber::new("2.00647");
+    let n1 = SmallNumber::new("1.3601");
+    let n2 = SmallNumber::new("0.000647");
 
     let n3 = n1 - n2;
     println!("{}", n3);
-
 }
