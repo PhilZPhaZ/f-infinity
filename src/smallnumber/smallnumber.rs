@@ -123,6 +123,10 @@ impl SmallNumber {
         }
         len
     }
+
+    pub fn set_signe_to_positive(&mut self) {
+        self.signe = true;
+    }
 }
 
 // impl PartialEq

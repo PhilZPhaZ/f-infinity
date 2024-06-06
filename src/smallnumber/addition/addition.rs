@@ -57,6 +57,12 @@ impl std::ops::Add for SmallNumber {
         let rhs_number: BigNumber =
             BigNumber::new(&format!("{}{}", rhs.integer, &rhs_decimal_number_str));
         
+        // copy the numbers
+        let mut self_number_clone = self_number.clone();
+        let mut rhs_number_clone = rhs_number.clone();
+        self_number_clone.set_signe_to_positive();
+        rhs_number_clone.set_signe_to_positive();
+        
         // addition process
         let mut addition: BigNumber;
 
@@ -77,6 +83,17 @@ impl std::ops::Add for SmallNumber {
             }
         }
 
+        // find the signe
+        let signe = if self.signe == rhs.signe {
+            true
+        } else {
+            if self_number_clone > rhs_number_clone {
+                self.signe
+            } else {
+                rhs.signe
+            }
+        };
+
 
         // here find the dot place
         let new_len_addition = addition.len();
@@ -88,9 +105,8 @@ impl std::ops::Add for SmallNumber {
         let result_integer: String = result.0;
         let result_decimal: Vec<u8> = result.1;
 
-
         SmallNumber {
-            signe: addition.signe,
+            signe: signe,
             integer: BigNumber::new(&result_integer),
             decimal: VecU8(result_decimal),
         }
