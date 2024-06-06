@@ -123,29 +123,11 @@ impl SmallNumber {
         }
         len
     }
-
-    pub fn set_signe_to_positive(&mut self) {
-        self.signe = true;
-    }
 }
 
 // impl PartialEq
 impl PartialEq for SmallNumber {
     fn eq(&self, other: &Self) -> bool {
         self.signe == other.signe && self.integer == other.integer && self.decimal == other.decimal
-    }
-}
-
-impl SmallNumber {
-    pub fn get_number_in_vec_str(&self) -> Vec<String> {
-        // partie decimale
-        let mut vec_str: Vec<String> = self.decimal.clone().0.into_iter()
-            .map(|c: u8| c.to_string())
-            .collect();
-
-        // partie entière
-        vec_str.insert(0, self.integer.to_string());
-
-        vec_str
     }
 }
