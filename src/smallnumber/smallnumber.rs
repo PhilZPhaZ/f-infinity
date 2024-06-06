@@ -115,6 +115,14 @@ impl SmallNumber {
         }
         len
     }
+
+    pub fn len_decimal(&self) -> BigNumber {
+        let mut len = BigNumber::zero();
+        for _i in &self.decimal.0 {
+            len = len + BigNumber::one()
+        }
+        len
+    }
 }
 
 // impl PartialEq

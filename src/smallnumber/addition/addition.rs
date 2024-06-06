@@ -1,17 +1,6 @@
 use super::super::super::bignumber::bignumber::BigNumber;
 use super::super::smallnumber::{SmallNumber, VecU8};
 
-/*
-fn zeros_in_common(s1: &str, s2: &str) -> BigNumber {
-    let mut i = 0;
-    while i < s1.len() && i < s2.len() && s1.chars().nth(i).unwrap() == '0' && s2.chars().nth(i).unwrap() == '0' {
-        i += 1;
-    }
-    let mut number = i.to_string();
-    BigNumber::new(&number)
-}
-*/
-
 impl std::ops::Add for SmallNumber {
     type Output = SmallNumber;
 
@@ -35,20 +24,15 @@ impl std::ops::Add for SmallNumber {
             }
         }
 
-        // get the biggest len between the two numbers
-        // and find where the dot is placed
-        let len_self: BigNumber = self.len();
-        let len_rhs: BigNumber = rhs.len();
+        // find the biggest len of the two decimals parts and the biggest part will be in dot_place
+        let self_decimal_len = self.len_decimal();
+        let rhs_decimal_len = rhs.len_decimal();
+        let dot_place: BigNumber;
 
-        let len_max: BigNumber;
-        let mut dot_place: BigNumber;
-
-        if len_self >= len_rhs {
-            len_max = len_self;
-            dot_place = self.integer.len();
+        if self_decimal_len > rhs_decimal_len {
+            dot_place = self_decimal_len;
         } else {
-            len_max = len_rhs;
-            dot_place = rhs.integer.len();
+            dot_place = rhs_decimal_len;
         }
 
         // convert lhs_decimal to &str and then create a variable self_decimal_number
@@ -60,7 +44,7 @@ impl std::ops::Add for SmallNumber {
             .join("");
 
         // create also a BigNumber but with the decimal part also
-        let mut self_number: BigNumber =
+        let self_number: BigNumber =
             BigNumber::new(&format!("{}{}", self.integer, &self_decimal_number_str));
 
         // Same thing for rhs_decimal
@@ -70,16 +54,9 @@ impl std::ops::Add for SmallNumber {
             .collect::<Vec<_>>()
             .join("");
 
-        let mut rhs_number: BigNumber =
+        let rhs_number: BigNumber =
             BigNumber::new(&format!("{}{}", rhs.integer, &rhs_decimal_number_str));
-
-        // find the biggest number to have the signe
-        let signe: bool = if self_number.set_signe_to_positive() > rhs_number.set_signe_to_positive() {
-            true
-        } else {
-            false
-        };
-
+        
         // addition process
         let mut addition: BigNumber;
 
@@ -89,21 +66,33 @@ impl std::ops::Add for SmallNumber {
             addition = self_number - rhs_number;
         }
         addition.set_signe_to_positive();
-        let mut len_addition: BigNumber = addition.len();
+        let len_addition: BigNumber = addition.len();
 
-        while len_addition != len_max {
-            len_addition = len_addition - BigNumber::one();
-            dot_place = dot_place + BigNumber::one();
+        if len_addition < dot_place {
+            let difference: BigNumber = dot_place.clone() - len_addition.clone();
+            let mut i = BigNumber::zero();
+            while i <= difference {
+                i = i + BigNumber::one();
+                addition.digits.0.insert(0, 0);
+            }
         }
 
-        let result: (String, Vec<u8>) = addition.separate_in_two_str(dot_place);
+
+        // here find the dot place
+        let new_len_addition = addition.len();
+
+        let dot_difference = new_len_addition - dot_place;
+
+        // transform the result to be useable
+        let result: (String, Vec<u8>) = addition.separate_in_two_str(dot_difference);
         let result_integer: String = result.0;
         let result_decimal: Vec<u8> = result.1;
 
+
         SmallNumber {
+            signe: addition.signe,
             integer: BigNumber::new(&result_integer),
-            signe: signe,
-            decimal: VecU8(result_decimal)
+            decimal: VecU8(result_decimal),
         }
     }
 }
