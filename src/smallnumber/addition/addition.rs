@@ -94,7 +94,6 @@ impl std::ops::Add for SmallNumber {
             }
         };
 
-
         // here find the dot place
         let new_len_addition = addition.len();
 

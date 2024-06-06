@@ -5,7 +5,7 @@ impl std::ops::Sub for SmallNumber {
     type Output = SmallNumber;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        // if the two decimal parts of the numbers have not the same length
+                // if the two decimal parts of the numbers have not the same length
         // then we add zero to the rigne to the smallest number to have the same length
         let mut lhs_decimal: Vec<u8> = self.decimal.0.clone();
         let mut rhs_decimal: Vec<u8> = rhs.decimal.0.clone();
@@ -24,20 +24,15 @@ impl std::ops::Sub for SmallNumber {
             }
         }
 
-        // get the biggest len between the two numbers
-        // and find where the dot is placed
-        let len_self: BigNumber = self.len();
-        let len_rhs: BigNumber = rhs.len();
+        // find the biggest len of the two decimals parts and the biggest part will be in dot_place
+        let self_decimal_len = self.len_decimal();
+        let rhs_decimal_len = rhs.len_decimal();
+        let dot_place: BigNumber;
 
-        let len_max: BigNumber;
-        let mut dot_place: BigNumber;
-
-        if len_self >= len_rhs {
-            len_max = len_self;
-            dot_place = self.integer.len();
+        if self_decimal_len > rhs_decimal_len {
+            dot_place = self_decimal_len;
         } else {
-            len_max = len_rhs;
-            dot_place = rhs.integer.len();
+            dot_place = rhs_decimal_len;
         }
 
         // convert lhs_decimal to &str and then create a variable self_decimal_number
@@ -49,7 +44,7 @@ impl std::ops::Sub for SmallNumber {
             .join("");
 
         // create also a BigNumber but with the decimal part also
-        let mut self_number: BigNumber =
+        let self_number: BigNumber =
             BigNumber::new(&format!("{}{}", self.integer, &self_decimal_number_str));
 
         // Same thing for rhs_decimal
@@ -59,58 +54,62 @@ impl std::ops::Sub for SmallNumber {
             .collect::<Vec<_>>()
             .join("");
 
-        let mut rhs_number: BigNumber =
+        let rhs_number: BigNumber =
             BigNumber::new(&format!("{}{}", rhs.integer, &rhs_decimal_number_str));
-
-        let self_number_abs = self_number.set_signe_to_positive();
-        let rhs_number_abs = rhs_number.set_signe_to_positive();
-
-        // find the biggest number to have the signe and to create the biggest and smallest number variable
-        let (biggest_number, smallest_number) = if self_number_abs > rhs_number_abs {
-            (self_number.clone(), rhs_number.clone())
-        } else {
-            (rhs_number.clone(), self_number.clone())
-        };
-
-        // signe
-        let signe = if self.signe == rhs.signe {
-            if rhs_number > self_number {
-                false
-            } else {
-                true
-            }
-        } else {
-            if self.signe == false {
-                false
-            } else {
-                true
-            }
-        };
-
+        
+        // copy the numbers
+        let mut self_number_clone = self_number.clone();
+        let mut rhs_number_clone = rhs_number.clone();
+        self_number_clone.set_signe_to_positive();
+        rhs_number_clone.set_signe_to_positive();
+        
         // addition process
-        let mut addition: BigNumber;
+        let mut substraction: BigNumber;
 
-        if self.signe == rhs.signe {
-            addition = biggest_number - smallest_number;
+        if (self.signe == rhs.signe) == true {
+            substraction = self_number - rhs_number;
+        } else if (self.signe == rhs.signe) == false {
+            substraction = self_number + rhs_number;
+        } else if self.signe == true && rhs.signe == false {
+            substraction = self_number + rhs_number;
         } else {
-            addition = biggest_number + smallest_number;
-        }
-        addition.set_signe_to_positive();
-        let mut len_addition: BigNumber = addition.len();
-
-        while len_addition != len_max {
-            len_addition = len_addition - BigNumber::one();
-            dot_place = dot_place + BigNumber::one();
+            substraction = self_number - rhs_number;
         }
 
-        let result: (String, Vec<u8>) = addition.separate_in_two_str(dot_place);
+        substraction.set_signe_to_positive();
+        let len_substraction: BigNumber = substraction.len();
+
+        if len_substraction < dot_place {
+            let difference: BigNumber = dot_place.clone() - len_substraction.clone();
+            let mut i = BigNumber::zero();
+            while i <= difference {
+                i = i + BigNumber::one();
+                substraction.digits.0.insert(0, 0);
+            }
+        }
+
+        // find the signe
+        let signe: bool;
+        if self_number_clone > rhs_number_clone {
+            signe = self.signe;
+        } else {
+            signe = !rhs.signe;
+        }
+
+        // here find the dot place
+        let new_len_substraction = substraction.len();
+
+        let dot_difference = new_len_substraction - dot_place;
+
+        // transform the result to be useable
+        let result: (String, Vec<u8>) = substraction.separate_in_two_str(dot_difference);
         let result_integer: String = result.0;
         let result_decimal: Vec<u8> = result.1;
 
         SmallNumber {
-            integer: BigNumber::new(&result_integer),
             signe: signe,
-            decimal: VecU8(result_decimal)
+            integer: BigNumber::new(&result_integer),
+            decimal: VecU8(result_decimal),
         }
     }
 }
