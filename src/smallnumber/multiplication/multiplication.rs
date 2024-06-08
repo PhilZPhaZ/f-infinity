@@ -10,39 +10,21 @@ impl std::ops::Mul for SmallNumber {
 
         let dot_placement: i128 = self_dot_placement + rhs_dot_placement;
 
-        // convert BigNumber to i128
-        let mut temp = self.integer.digits.0;
-        let mut bytes = [0u8; 16];
-        temp.copy_from_slice(&mut bytes);
-        let self_integer = i128::from_le_bytes(bytes);
+        // convert Self and Rhs to string
+        let mut self_number_string = String::new();
+        let mut rhs_number_string = String::new();
 
-        // create a Vec i128 with self.integer (i128) an self.decimal.0 (Vec u8)
-        let mut self_number: Vec<i128> = vec![self_integer];
-        for value in self.decimal.0.iter() {
-            self_number.push(*value as i128);
+        let integer_string = format!("{}", self.integer);
+        let integer_rhs = format!("{}", rhs.integer);
+
+        self_number_string.push_str(&integer_string);
+        rhs_number_string.push_str(&integer_rhs);
+
+        for number in self.decimal.0 {
+            self_number_string.push_str(&number.to_string());
         }
-
-        // same for rhs
-        let mut temp = rhs.integer.digits.0;
-        let mut bytes = [0u8; 16];
-        temp.copy_from_slice(&mut bytes);
-        let rhs_integer = i128::from_le_bytes(bytes);
-
-        let mut rhs_number: Vec<i128> = vec![rhs_integer];
-        for value in rhs.decimal.0.iter() {
-            rhs_number.push(*value as i128);
-        }
-
-        // convert self_number into String
-        let mut self_number_string: String = String::new();
-        for value in self_number.iter() {
-            self_number_string.push_str(&value.to_string());
-        }
-
-        // convert rhs_number into String
-        let mut rhs_number_string: String = String::new();
-        for value in rhs_number.iter() {
-            rhs_number_string.push_str(&value.to_string());
+        for number in rhs.decimal.0 {
+            rhs_number_string.push_str(&number.to_string());
         }
 
         // multiply 2 BigNumber to have the result
