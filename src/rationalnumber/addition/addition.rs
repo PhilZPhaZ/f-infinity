@@ -21,10 +21,14 @@ impl std::ops::Add for RationalNumber {
         // determinate the signe
         let new_signe: bool = new_numerator.signe == new_denominator.signe;
 
+        // precision
+        let precision = self.precision;
+
         RationalNumber {
             numerator: new_numerator,
             denominator: new_denominator,
             signe: new_signe,
+            precision: precision
         }
     }
 }

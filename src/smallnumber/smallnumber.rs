@@ -123,6 +123,15 @@ impl SmallNumber {
         }
         len
     }
+
+    pub fn remove_zeros_decimal(&mut self) {
+        while self.decimal.0.last() == Some(&0) {
+            self.decimal.0.pop();
+        }
+        if self.len_decimal() == BigNumber::zero() {
+            self.decimal.0.push(0);
+        }
+    }
 }
 
 // impl PartialEq

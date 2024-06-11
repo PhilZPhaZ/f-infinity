@@ -1,3 +1,5 @@
+use crate::bignumber::bignumber::BigNumber;
+
 use super::super::super::SmallNumber;
 use super::super::rationalnumber::RationalNumber;
 
@@ -10,10 +12,13 @@ impl std::ops::Mul for RationalNumber {
 
         let new_signe: bool = new_numerator.signe == new_denominator.signe;
 
+        let precision = BigNumber::new("100");
+
         RationalNumber {
             numerator: new_numerator,
             denominator: new_denominator,
             signe: new_signe,
+            precision: precision
         }
     }
 }
