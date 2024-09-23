@@ -2,9 +2,9 @@ use std::cmp::PartialEq;
 use std::fmt;
 use super::super::bignumber::bignumber::BigNumber;
 
-pub struct VecU8(pub Vec<u8>);
+pub struct VecU8_SmallNumber(pub Vec<u8>);
 
-impl fmt::Display for VecU8 {
+impl fmt::Display for VecU8_SmallNumber {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut number: String = String::new();
 
@@ -18,16 +18,16 @@ impl fmt::Display for VecU8 {
     }
 }
 
-// impl clone for VecU8
-impl Clone for VecU8 {
+// impl clone for VecU8_SmallNumber
+impl Clone for VecU8_SmallNumber {
     fn clone(&self) -> Self {
         let cloned_digits: Vec<u8> = self.0.iter().cloned().collect();
-        VecU8(cloned_digits)
+        VecU8_SmallNumber(cloned_digits)
     }
 }
 
-// impl PartialEq for VecU8
-impl PartialEq for VecU8 {
+// impl PartialEq for VecU8_SmallNumber
+impl PartialEq for VecU8_SmallNumber {
     fn eq(&self, other: &Self) -> bool {
         self.0 == other.0
     }
@@ -36,7 +36,7 @@ impl PartialEq for VecU8 {
 pub struct SmallNumber {
     pub signe: bool,
     pub integer: BigNumber,
-    pub decimal: VecU8,
+    pub decimal: VecU8_SmallNumber,
 }
 
 // impl .clone for SmallNumber
@@ -44,7 +44,7 @@ impl Clone for SmallNumber {
     fn clone(&self) -> Self {
         let signe: bool = self.signe;
         let integer: BigNumber = self.integer.clone();
-        let decimal: VecU8 = self.decimal.clone();
+        let decimal: VecU8_SmallNumber = self.decimal.clone();
 
         SmallNumber {
             signe,
@@ -94,7 +94,7 @@ impl SmallNumber {
                 let mut result = SmallNumber {
                     signe: false,
                     integer: integer,
-                    decimal: VecU8(decimal),
+                    decimal: VecU8_SmallNumber(decimal),
                 };
                 result.remove_zeros_decimal();
                 result
@@ -102,7 +102,7 @@ impl SmallNumber {
                 let mut result = SmallNumber {
                     signe: true,
                     integer,
-                    decimal: VecU8(decimal),
+                    decimal: VecU8_SmallNumber(decimal),
                 };
                 result.remove_zeros_decimal();
                 result

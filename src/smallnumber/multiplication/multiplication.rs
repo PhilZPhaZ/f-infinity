@@ -1,5 +1,5 @@
 use super::super::super::BigNumber;
-use super::super::smallnumber::{SmallNumber, VecU8};
+use super::super::smallnumber::{SmallNumber, VecU8_SmallNumber};
 
 impl std::ops::Mul for SmallNumber {
     type Output = SmallNumber;
@@ -36,7 +36,7 @@ impl std::ops::Mul for SmallNumber {
         let mut dot_placement: i128 = len_result - dot_placement;
 
         let mut integer: i128 = 0;
-        let mut decimal: VecU8 = VecU8(vec![0]);
+        let mut decimal: VecU8_SmallNumber = VecU8_SmallNumber(vec![0]);
 
         // if dot placement <= 0 add 0 to result
         if dot_placement <= 0 {

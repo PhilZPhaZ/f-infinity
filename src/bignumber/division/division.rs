@@ -1,6 +1,6 @@
 use super::super::super::bignumber::bignumber::{BigNumber, VecU8};
 
-use super::super::super::smallnumber::smallnumber::SmallNumber;
+use super::super::super::smallnumber::smallnumber::{SmallNumber, VecU8_SmallNumber};
 use std::ops::Div;
 
 impl Div for BigNumber {
@@ -92,11 +92,19 @@ impl Div for BigNumber {
         // split the quotien_vec_u8 in two parts
         let (first_part, second_part) = quotient_vec_u8.split_in_two(index);
 
-        // create the final result
-        let mut result: String = first_part.to_string();
-        result.push('.');
-        result.push_str(&second_part.to_string());
+        // remove useless zeros in first_part
+        let integer_part: BigNumber = BigNumber::new(&first_part.to_string());
 
-        SmallNumber::new(&result)
+        // transform the second_part into VecU8_SmallNumber
+        let second_part: VecU8_SmallNumber = VecU8_SmallNumber(second_part.0);
+
+        // handle the sign
+        let signe: bool = self.signe == rhs.signe;
+
+        SmallNumber {
+            signe: signe,
+            integer: integer_part,
+            decimal: second_part,
+        }
     }
 }

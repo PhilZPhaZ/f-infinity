@@ -1,5 +1,5 @@
 use super::super::super::bignumber::bignumber::BigNumber;
-use super::super::smallnumber::{SmallNumber, VecU8};
+use super::super::smallnumber::{VecU8_SmallNumber, SmallNumber};
 
 impl std::ops::Add for SmallNumber {
     type Output = SmallNumber;
@@ -107,7 +107,7 @@ impl std::ops::Add for SmallNumber {
         SmallNumber {
             signe: signe,
             integer: BigNumber::new(&result_integer),
-            decimal: VecU8(result_decimal),
+            decimal: VecU8_SmallNumber(result_decimal),
         }
     }
 }
