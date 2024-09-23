@@ -91,20 +91,24 @@ impl SmallNumber {
                 .collect::<Vec<_>>();
 
             if number.contains('-') {
-                SmallNumber {
+                let mut result = SmallNumber {
                     signe: false,
                     integer: integer,
                     decimal: VecU8(decimal),
-                }
+                };
+                result.remove_zeros_decimal();
+                result
             } else {
-                SmallNumber {
+                let mut result = SmallNumber {
                     signe: true,
                     integer,
                     decimal: VecU8(decimal),
-                }
+                };
+                result.remove_zeros_decimal();
+                result
             }
         } else {
-            panic!("Invalid format");
+            panic!("Invalid format (number.decimal needed)");
         }
     }
 
@@ -132,6 +136,13 @@ impl SmallNumber {
             self.decimal.0.push(0);
         }
     }
+
+    pub fn div(&self, other: &SmallNumber) -> SmallNumber {
+        // full div for 2 small numbers
+        SmallNumber::new("2.0")
+    }
+
+    
 }
 
 // impl PartialEq

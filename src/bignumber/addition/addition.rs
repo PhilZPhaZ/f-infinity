@@ -40,6 +40,7 @@ impl Add for BigNumber {
         BigNumber {
             digits: VecU8(result),
             signe: true,
+            division_precision: self.division_precision,
         }
     }
 }

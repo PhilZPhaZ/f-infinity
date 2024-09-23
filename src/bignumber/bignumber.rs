@@ -18,9 +18,35 @@ impl fmt::Display for VecU8 {
     }
 }
 
+impl VecU8 {
+    pub fn split_in_two(&self, split_number: BigNumber) -> (VecU8, VecU8) {
+        let mut i: BigNumber = BigNumber::zero();
+        let mut string_result_first_part: VecU8 = VecU8(vec![]);
+        let mut vec_result_second_part: VecU8 = VecU8(vec![]);
+        let mut index: usize = 0;
+
+        while i < split_number {
+            i = i + BigNumber::one();
+            string_result_first_part.0.push(self.0[index]);
+            index += 1;
+        }
+
+        while i < BigNumber::new(&self.0.len().to_string()) {
+            vec_result_second_part.0.push(self.0[index]);
+            i = i + BigNumber::one();
+            index += 1;
+        }
+
+        (string_result_first_part, vec_result_second_part)
+    }
+}
+
+// will have to create a new number to store division precision
+// will do that later
 pub struct BigNumber {
     pub digits: VecU8,
     pub signe: bool,
+    pub division_precision: u128,
 }
 
 // le clone
@@ -31,6 +57,7 @@ impl Clone for BigNumber {
         return BigNumber {
             digits: VecU8(cloned_digits),
             signe,
+            division_precision: self.division_precision,
         };
     }
 }
@@ -68,6 +95,7 @@ impl BigNumber {
         BigNumber {
             digits: VecU8(digits),
             signe: signe,
+            division_precision: 10,
         }
     }
 
@@ -126,6 +154,10 @@ impl BigNumber {
         }
 
         (string_result_first_part, vec_result_second_part)
+    }
+
+    pub fn change_precision(&mut self, precision: u128) {
+        self.division_precision = precision;
     }
 }
 

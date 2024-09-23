@@ -88,6 +88,7 @@ impl Mul for BigNumber {
         BigNumber {
             digits: VecU8(result_final),
             signe,
+            division_precision: self.division_precision,
         }
     }
 }

@@ -7,11 +7,10 @@ use rationalnumber::rationalnumber::RationalNumber;
 use smallnumber::smallnumber::SmallNumber;
 
 fn main() {
-    let n1 = SmallNumber::new("5.6");
-    let n2 = SmallNumber::new("12.34");
+    let mut n1 = BigNumber::new("2204");
+    let mut n2 = BigNumber::new("43");
 
-    let mut n3 = n1 / n2;
-    n3.change_precision("14");
-    
-    println!("{}", n3.to_small_number());
+    let result = n1 / n2;
+
+    println!("{}", result);
 }

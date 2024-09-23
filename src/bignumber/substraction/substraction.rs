@@ -65,6 +65,7 @@ impl Sub for BigNumber {
         BigNumber {
             digits: VecU8(result),
             signe: !is_negative,
+            division_precision: self.division_precision,
         }
     }
 }
