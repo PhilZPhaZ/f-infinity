@@ -33,6 +33,16 @@ impl PartialEq for VecU8_SmallNumber {
     }
 }
 
+impl VecU8_SmallNumber {
+    pub fn len(&self) -> BigNumber {
+        let mut len = BigNumber::zero();
+        for _i in &self.0 {
+            len = len + BigNumber::one()
+        }
+        len
+    }
+}
+
 pub struct SmallNumber {
     pub signe: bool,
     pub integer: BigNumber,
